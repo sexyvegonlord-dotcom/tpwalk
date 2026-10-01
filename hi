@@ -36,3 +36,69 @@ RunService.Heartbeat:Connect(function()
         root.CFrame += direction.Unit * tpWalkAmount
     end
 end)
+
+local RunService = game:GetService("RunService")
+
+local markers = {}
+
+local function addPrompt(prompt)
+    if markers[prompt] or not prompt:IsA("ProximityPrompt") then
+        return
+    end
+
+    local parent = prompt.Parent
+    if not parent then return end
+
+    local adornee
+
+    if parent:IsA("BasePart") then
+        adornee = parent
+    elseif parent:IsA("Attachment") then
+        adornee = parent
+    elseif parent:IsA("Model") then
+        local part = parent:FindFirstChildWhichIsA("BasePart", true)
+        adornee = part
+    end
+
+    if not adornee then return end
+
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "PromptMarker"
+    gui.Adornee = adornee
+    gui.Size = UDim2.fromOffset(220, 50)
+    gui.StudsOffset = Vector3.new(0, 3, 0)
+    gui.AlwaysOnTop = true
+    gui.Parent = game:GetService("CoreGui")
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.fromScale(1, 1)
+    label.BackgroundTransparency = 0.3
+    label.TextScaled = true
+    label.Text = "[" .. prompt.KeyboardKeyCode.Name .. "] "
+        .. prompt.ActionText
+        .. "\n"
+        .. prompt.ObjectText
+    label.Parent = gui
+
+    markers[prompt] = gui
+end
+
+for _, obj in ipairs(game:GetDescendants()) do
+    if obj:IsA("ProximityPrompt") then
+        addPrompt(obj)
+    end
+end
+
+game.DescendantAdded:Connect(function(obj)
+    if obj:IsA("ProximityPrompt") then
+        task.wait()
+        addPrompt(obj)
+    end
+end)
+
+game.DescendantRemoving:Connect(function(obj)
+    if markers[obj] then
+        markers[obj]:Destroy()
+        markers[obj] = nil
+    end
+end)
