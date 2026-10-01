@@ -15,7 +15,7 @@ UserInputService.InputBegan:Connect(function(input, processed)
         tpWalkAmount = 0
         print("TPWalk OFF")
     elseif input.KeyCode == Enum.KeyCode.Five then
-        tpWalkAmount += 0.01
+        tpWalkAmount += 0.0025
         enabled = true
         print("TPWalk amount:", tpWalkAmount)
     end
