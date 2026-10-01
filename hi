@@ -1,0 +1,38 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+local tpWalkAmount = 0
+local enabled = false
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+
+    if input.KeyCode == Enum.KeyCode.T then
+        enabled = false
+        tpWalkAmount = 0
+        print("TPWalk OFF")
+    elseif input.KeyCode == Enum.KeyCode.Five then
+        tpWalkAmount += 0.15
+        enabled = true
+        print("TPWalk amount:", tpWalkAmount)
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if not enabled or tpWalkAmount <= 0 then return end
+
+    local character = player.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid or not root then return end
+
+    local direction = humanoid.MoveDirection
+
+    if direction.Magnitude > 0 then
+        root.CFrame += direction.Unit * tpWalkAmount
+    end
+end)
